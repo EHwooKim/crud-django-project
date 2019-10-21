@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash # 이게 비번 바꾸고 로그인해주는거
 from django.contrib.auth import login as auth_login # login이라는 함수 우리가 정의해서 쓰고있어서 헷갈리지않게 이름 변경
 from django.contrib.auth import logout as auth_logout
-from IPython import embed
+from django.contrib.auth import update_session_auth_hash # 이게 비번 바꾸고 로그인해주는거
 from django.contrib.auth.decorators import login_required
+from IPython import embed
 
-from .forms import CustomUserChangeForm
+from .forms import CustomUserChangeForm, CustomUserCreationForm
+
 
 # Create your views here.
 
@@ -17,7 +18,7 @@ def signup(request):
     if request.user.is_authenticated:
         return redirect('articles:index')
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             # 회원가입 후 바로 로그인되는 사이트의 방법
             # user = form.save()
@@ -26,7 +27,7 @@ def signup(request):
             form.save()
             return redirect('articles:index')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     context = {
         'form' : form
     }
@@ -42,6 +43,7 @@ def login(request):
         form = AuthenticationForm(request, request.POST)
         if form.is_valid():
             # 로그인 함수 호출
+            # AuthenticationForm 은 모델폼 아니고 fomrs.fomr이라  .get_user(), return 값이 User instance야
             user = form.get_user()
             auth_login(request, user)
             # 또는 위의 두 줄을 합쳐서
@@ -75,10 +77,12 @@ def update(request):
     }
     return render(request, 'accounts/form.html', context)
 
+
 @login_required
 def password_change(request):
     # model form이 아니라 그냥 form이라서 반드시 첫번쨰 인자로 user를 넘겨줘야 한다.
     if request.method == 'POST':
+        # 인자로 user정보 먼저 넘겨줘야 한다는 것이 포인트!
         form = PasswordChangeForm(request.user,request.POST)
         if form.is_valid():
             # 비밀번호 바뀌는 순간 그 전에 저장되어있던 세션의 정보(비밀번호)가 달라져서 로그아웃된다.

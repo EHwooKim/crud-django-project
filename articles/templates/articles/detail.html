@@ -3,6 +3,7 @@
 {% block body %}
   <div class="mt-5">
     <h1>{{ article.id }}번 글</h1>
+    <p>작성자 : {{ article.user }}</p>
     <h2>{{ article.title }}</h2>
     <div class="d-flex flex-column align-items-end">
     <p>작성일자 : {{ article.created_at }}</p>
@@ -24,6 +25,7 @@
       <div style="margin-left: 48px;padding-left: 12px; border-left: solid 0.5px">
         {%for comment in comments%}
           <p>{{comment.content}}</p>
+          <p>{{comment.user}}</p>
           <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" onclick="return confirm('댓글 진짜 지울껴?')">
             {% csrf_token%}
             <input class="btn btn-dark ml-2" type="submit" value="삭제">

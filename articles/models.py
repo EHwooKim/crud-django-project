@@ -1,6 +1,8 @@
 from django.db import models
 from imagekit.models import ProcessedImageField, ImageSpecField
 from imagekit.processors import ResizeToFill
+from django.conf import settings
+
 # Create your models here.
 
 # 기본 모델을 받아서 나만의 아티클을 생성한다는 느낌
@@ -29,6 +31,7 @@ class Article(models.Model):    # models.Model 을 상속 받는 형식으로 �
     #   auto_now : 수정시마다 자동으로 저장
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True)      # 이런식으로 다양한 필드 생성 가능. 다 쓰고나서 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
                                                           # python manage.py makemigrations 해서 마이그레이션 파일 생성 (소원쪽지 같은거라고 보면 된다.) 이러면 migrations 파일이 만들어질거고
                                                           # python manage.py migrate 그 소원쪽지를 적용시켜줘! - db에 반영!
     def __str__(self):
@@ -38,6 +41,7 @@ class Comment(models.Model):
     content = models.CharField(max_length=140)
     created_at = models.DateField(auto_now_add=True)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     # on_delete
     # 1. CASCADE : 글이 삭제되었을 때 모든 댓글을 삭제
     # 2. PROTECT : 댓글이 존재하면 글 삭제 안됨.

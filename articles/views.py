@@ -39,9 +39,11 @@ def create(request):
             # content = article_form.cleaned_data.get('content')
             # article = Article(title=title, content=content)
             # article.save()
-
             # meta 어쩌구 이후로는 바로 이렇게만 해도 된다
-            article = article_form.save()
+            article = article_form.save(commit=False)
+            # user instance를 가져와야한다. 그건 어디에 있다? requset.user
+            article.user = request.user
+            article.save()
             return redirect('articles:detail', article.pk)
     else:
     # GET 요청 처리 -> form 만 주는거
@@ -109,6 +111,7 @@ def delete(request, article_pk):
 
 def comment_create(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
+
     #1. modelform에 사용자 입력값 넣고
     comment_form = CommentForm(request.POST)
     #2. 검증하고
@@ -118,6 +121,7 @@ def comment_create(request, article_pk):
         comment = comment_form.save(commit=False)
         #3-2. FK 넣고 저장!
         comment.article = article
+        comment.user = request.user
         comment.save()
     else:
         messages.success(request, '댓글이 형식에 맞지 않습니다.')

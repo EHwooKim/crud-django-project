@@ -142,3 +142,4 @@ MEDIA_URL = '/media/'
 # default라 굳이 안넣어도 되지만 헷갈리지않게 작성해보자면
 # AUTH
 LOGIN_URL = '/accounts/login/' #default! @login_required에서 사용된다.
+AUTH_USER_MODEL = 'accounts.User' #default - 'auth.User'

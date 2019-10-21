@@ -25,7 +25,7 @@ class ArticleForm(forms.ModelForm):
     # 데이터에 대한 데이터
     class Meta:
         model = Article
-        fields = '__all__'
+        exclude = ('user',)
         # 위젯 설정 1.
         # widgets = {
         #     'title':forms.TextInput(
@@ -40,7 +40,7 @@ class ArticleForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        exclude = ('article',)
+        exclude = ('article','user',)
 
 
 # 처음에는 이렇게 배웠지. 그런데 하고보니 model 정보를 받와와서 할 수 있을거 같아!!
