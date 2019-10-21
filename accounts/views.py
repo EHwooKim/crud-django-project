@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash # 이게 비번 바꾸고 로그인해주는거
 from django.contrib.auth import login as auth_login # login이라는 함수 우리가 정의해서 쓰고있어서 헷갈리지않게 이름 변경
 from django.contrib.auth import logout as auth_logout
 from IPython import embed
+from django.contrib.auth.decorators import login_required
 
+from .forms import CustomUserChangeForm
 
 # Create your views here.
 
@@ -27,7 +30,7 @@ def signup(request):
     context = {
         'form' : form
     }
-    return render(request, 'accounts/signup.html', context)
+    return render(request, 'accounts/form.html', context)
 
 # 로그인은 인증과 관련된 폼, Authentication
 def login(request):
@@ -56,3 +59,35 @@ def logout(request):
     auth_logout(request)
     return redirect('articles:index')
 
+@login_required
+def update(request):
+    # if not request.user.is_authenticated:
+    #     return redirect('articles:index') 이거보다 login_required가 더 좋네
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('articles:index')
+    else:
+        form = CustomUserChangeForm(instance=request.user) 
+    context = {
+        'form':form
+    }
+    return render(request, 'accounts/form.html', context)
+
+@login_required
+def password_change(request):
+    # model form이 아니라 그냥 form이라서 반드시 첫번쨰 인자로 user를 넘겨줘야 한다.
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user,request.POST)
+        if form.is_valid():
+            # 비밀번호 바뀌는 순간 그 전에 저장되어있던 세션의 정보(비밀번호)가 달라져서 로그아웃된다.
+            form.save()
+            update_session_auth_hash(request, form.user) # request랑 user정보인데 user 정보는 form 에서
+            return redirect('articles:index')
+    else:
+        form = PasswordChangeForm(request.user)
+    context = {
+        'form':form
+    }
+    return render(request, 'accounts/form.html', context)
