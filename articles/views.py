@@ -5,6 +5,9 @@ from .forms import ArticleForm, CommentForm
 from django.contrib import messages
 from IPython import embed
 import bootstrap4
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseForbidden
+
 
 
 from .models import Article, Comment
@@ -24,6 +27,18 @@ def index(request):
     }
     # embed()
     return render(request, 'articles/index.html', context)
+
+def detail(request, article_pk):
+    # article = Article.objects.get(pk=article_pk)
+    article = get_object_or_404(Article, pk=article_pk)
+    comments = article.comment_set.all()
+    comment_form = CommentForm()
+    context = {
+        'article': article,
+        'comments': comments,
+        'comment_form': comment_form
+    }
+    return render(request, 'articles/detail.html', context)
 
 # def new(request):
 #     return render(request, 'articles/new.html')
@@ -55,48 +70,49 @@ def create(request):
     }
     return render(request, 'articles/form.html', context)
 
+
 def update(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
-    if request.method == 'POST':
-        article_form = ArticleForm(request.POST, instance=article)
-        if article_form.is_valid():
-            # article.title = article_form.cleaned_data.get('title')
-            # article.content = article_form.cleaned_data.get('content')
-            # article.save()
-            article = article_form.save()
-            return redirect('articles:detail', article_pk)
+    if article.user == request.user:
+    # if article.user != request.user:
+    #     messages.success(request, '유저정보가 일치하지 않습니다.')
+    #     return redirect('articles:detail', article_pk)
+    # else:   
+        if request.method == 'POST':
+            article_form = ArticleForm(request.POST, instance=article)
+            if article_form.is_valid():
+                # article.title = article_form.cleaned_data.get('title')
+                # article.content = article_form.cleaned_data.get('content')
+                # article.save()
+                article = article_form.save()
+                return redirect('articles:detail', article_pk)
+        else:
+            # article_form = ArticleForm(
+            #     initial={
+            #         'title':article.title,
+            #         'content':article.content
+            #     }
+            # )
+            article_form = ArticleForm(instance=article)
+        context = {
+            # 'article':article,
+            'article_form':article_form
+        }
+        return render(request, 'articles/form.html', context)    
     else:
-        # article_form = ArticleForm(
-        #     initial={
-        #         'title':article.title,
-        #         'content':article.content
-        #     }
-        # )
-        article_form = ArticleForm(instance=article)
-    context = {
-        # 'article':article,
-        'article_form':article_form
-    }
-    return render(request, 'articles/form.html', context)    
+        raise PermissionDenied  
 
-def detail(request, article_pk):
-    # article = Article.objects.get(pk=article_pk)
-    article = get_object_or_404(Article, pk=article_pk)
-    comments = article.comment_set.all()
-    comment_form = CommentForm()
-    context = {
-        'article': article,
-        'comments': comments,
-        'comment_form': comment_form
-    }
-    return render(request, 'articles/detail.html', context)
 
 @require_POST
 def delete(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
+    if article.user != request.user:
+        messages.success(request, '유저정보가 일치하지 않습니다.')
+        return redirect('articles:detail', article_pk)
+    else:       
     # if request.method == 'POST':
-    article.delete()
-    return redirect('articles:index')
+        article.delete()
+        return redirect('articles:index')
     # else: # 이렇게하면 포스트 요청으로만 지울 수 있으니까 주소창에서 ~/123/delete 이렇게 적는다고 지워지지 않겠지
     #     return redirect('articles:detail', article.pk)
 
@@ -108,7 +124,8 @@ def delete(request, article_pk):
 #     return render(request, 'articles/edit.html', context)
 
 
-
+@require_POST
+@login_required
 def comment_create(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
 
@@ -137,7 +154,11 @@ def comment_create(request, article_pk):
 @require_POST
 def comment_delete(request, article_pk, comment_pk):
     comment = Comment.objects.get(pk=comment_pk)
-    comment.delete()
-    # messages.add_message(request, messages.SUCCESS, '댓글이 삭제되었습니다.') 이거도 되지만 밑에 거가 shortcut
-    messages.success(request, '댓글이 삭제되었습니다.')
-    return redirect('articles:detail', article_pk)
+    if comment.user == request.user:
+        comment.delete()
+        # messages.add_message(request, messages.SUCCESS, '댓글이 삭제되었습니다.') 이거도 되지만 밑에 거가 shortcut
+        messages.success(request, '댓글이 삭제되었습니다.')
+        return redirect('articles:detail', article_pk)
+    else:
+        # PermissionDenied 이랑 HttpResponseForbidden 이랑 비슷. raise가 어색하니 return으로 통일하게 HttpResponseForbidden으로 하자
+        return  HttpResponseForbidden()

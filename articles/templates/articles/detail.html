@@ -24,12 +24,13 @@
       </div>
       <div style="margin-left: 48px;padding-left: 12px; border-left: solid 0.5px">
         {%for comment in comments%}
-          <p>{{comment.content}}</p>
-          <p>{{comment.user}}</p>
+          <p>작성자 : {{comment.user}} | {{comment.content}}</p>
+          {% if comment.user == user %}
           <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" onclick="return confirm('댓글 진짜 지울껴?')">
             {% csrf_token%}
             <input class="btn btn-dark ml-2" type="submit" value="삭제">
           </form>          
+          {% endif %}
         {% empty %}
           <p>무플..ㅠㅠ 관심 좀 주세요</p> <!-- empty 쓰면 굳이 if 어쩌구 count 가 0 어쩌구 할필요가 없겠지-->
         {%endfor%}
@@ -39,11 +40,13 @@
     <div class="d-flex justify-content-end mt-3">
       <a class="btn btn-dark ml-2" href="{% url 'articles:index' %}" role="button">돌아가기</a>
       <!-- <a class="btn btn-dark ml-2" href="{% url 'articles:delete' article.pk %}" role="button">삭제하기</a> -->
+      {% if article.user == user %}
       <form action="{% url 'articles:delete' article.pk %}" method="POST" onclick="return confirm('진짜 지울껴?')">
         {% csrf_token%}
         <input class="btn btn-dark ml-2" type="submit" value="삭제">
       </form>
       <a class="btn btn-dark ml-2" href="{% url 'articles:update' article.pk %}" role="button">수정하기</a>
+      {% endif %}
     </div>
     <hr>
     <h3>댓글 작성</h3>
@@ -54,10 +57,4 @@
       <input class="d-block btn btn-dark ml-auto mt-2 " type="submit" value="등록">
     </form>
   </div>
-
-
-  
-
-  
-
 {% endblock %}

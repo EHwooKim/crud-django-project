@@ -55,4 +55,12 @@ class Comment(models.Model):
 #                - DB 설계도 작성 !
 # migrate - 위의 설계도, migration 파일 DB 반영
 
-
+# #--------------------------------------------------------
+# # 상속관련 추가내용 이렇게 상속받아서 원하는대로 만들수가 있다
+# class TimeStampMixin(models.Model):
+#     created_at = models.DateTimeField(auto_now_add=True)  
+#     updated_at = models.DateTimeField(auto_now=True)
+# # 이렇게 해놓고 
+# class Artivle(TimeStampMixin):
+#     pass
+# # 같이 상속받으면 생성, 수정시간이 기본적으로 들어가게 되겠지!

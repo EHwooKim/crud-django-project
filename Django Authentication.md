@@ -118,6 +118,7 @@ class CustomUserChangeForm(UserChangeForm):
 
 ```python
 form = AuthenticationForm(request=request, data=request.POST)
+# form = AuthenticationForm(request, request.POST) 이것도 되는거고
 if form.is_valid():
     user = form.get_user()
 ```
