@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import login as auth_login # login이라는 함수 우리가 정의해서 쓰고있어서 헷갈리지않게 이름 변경
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash # 이게 비번 바꾸고 로그인해주는거
@@ -33,6 +33,7 @@ def signup(request):
     }
     return render(request, 'accounts/form.html', context)
 
+
 # 로그인은 인증과 관련된 폼, Authentication
 def login(request):
     # 로그인되어 있는 사람이 로그인 시도할 때 되돌려 보내기
@@ -43,7 +44,7 @@ def login(request):
         form = AuthenticationForm(request, request.POST)
         if form.is_valid():
             # 로그인 함수 호출
-            # AuthenticationForm 은 모델폼 아니고 fomrs.fomr이라  .get_user(), return 값이 User instance야
+            # AuthenticationForm 은 모델폼 아니고 fomrs.form이라  .get_user(), return 값이 User instance야
             user = form.get_user()
             auth_login(request, user)
             # 또는 위의 두 줄을 합쳐서
