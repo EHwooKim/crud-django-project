@@ -6,7 +6,7 @@ from django.contrib import messages
 from IPython import embed
 import bootstrap4
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden # 시험에서 이건 안나온다
 
 
 
@@ -125,25 +125,27 @@ def delete(request, article_pk):
 
 
 @require_POST
-@login_required
+# @login_required  << 이거 까지 쓰면 POST요청으로 인해 오류가 뜬다. 그러니 is_authenticated를 이용한다
 def comment_create(request, article_pk):
-    article = get_object_or_404(Article, pk=article_pk)
-
-    #1. modelform에 사용자 입력값 넣고
-    comment_form = CommentForm(request.POST)
-    #2. 검증하고
-    if comment_form.is_valid():
-    #3. 맞으면 저장
-        #3-1. 사용자 입력값으로 comment instace 생성 (저장은 하지않는다!) (아직 데이터베이스에 요청 X)
-        comment = comment_form.save(commit=False)
-        #3-2. FK 넣고 저장!
-        comment.article = article
-        comment.user = request.user
-        comment.save()
+    if request.user.is_authenticated:
+        article = get_object_or_404(Article, pk=article_pk)
+        #1. modelform에 사용자 입력값 넣고
+        comment_form = CommentForm(request.POST)
+        #2. 검증하고
+        if comment_form.is_valid():
+        #3. 맞으면 저장
+            #3-1. 사용자 입력값으로 comment instace 생성 (저장은 하지않는다!) (아직 데이터베이스에 요청 X)
+            comment = comment_form.save(commit=False)
+            #3-2. FK 넣고 저장!
+            comment.article = article
+            comment.user = request.user
+            comment.save()
+        else:
+            messages.success(request, '댓글이 형식에 맞지 않습니다.')
+        #4. return redirect
+        return redirect('articles:detail',article_pk)
     else:
-        messages.success(request, '댓글이 형식에 맞지 않습니다.')
-    #4. return redirect
-    return redirect('articles:detail',article_pk)
+        return HttpResponse('Unauthorized 로그인하거라',status=401)
     # comment = Comment()
     # comment.content = request.POST.get('comment')
     # comment.article_id = article_pk 
@@ -162,3 +164,17 @@ def comment_delete(request, article_pk, comment_pk):
     else:
         # PermissionDenied 이랑 HttpResponseForbidden 이랑 비슷. raise가 어색하니 return으로 통일하게 HttpResponseForbidden으로 하자
         return  HttpResponseForbidden()
+
+@login_required # 함수내에서 request.user를 쓰게 되면 로그인 확인 처리 하는거 잊지말아라!!!!!!!!!!!
+def like(request, article_pk):
+    article = Article.objects.get(id=article_pk)
+    # 좋아요를 누른적이 있다면?
+    if request.user in article.like_users.all():
+        #좋아요 취소 로직
+        article.like_users.remove(request.user)
+    # 아니면
+    else:
+        #좋아요 로직
+        article.like_users.add(request.user)
+    return  redirect('articles:detail', article_pk)
+    

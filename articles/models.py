@@ -34,6 +34,14 @@ class Article(models.Model):    # models.Model 을 상속 받는 형식으로 �
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
                                                           # python manage.py makemigrations 해서 마이그레이션 파일 생성 (소원쪽지 같은거라고 보면 된다.) 이러면 migrations 파일이 만들어질거고
                                                           # python manage.py migrate 그 소원쪽지를 적용시켜줘! - db에 반영!
+    # 좋아요 기능을 위해 user랑 또 연결을 시킬건데 user는 이미 위에 있으니까
+    like_users = models.ManyToManyField(
+                                settings.AUTH_USER_MODEL,      # User class랑 연결 시킬건데 models.py에서는 settings.AUTH_USER_MODEL로 한다!
+                                related_name = 'like_articles',# through 옵션은 여기서는 필요 없고. user입장에서 user.articles_set.all()을 했을때
+                                blank=True                     # 작성글, 좋아요글 구분을 위해 related_name은 필요하다
+                                )                              # blank_True: 좋아요 처음부터 있는거 아니니까
+                                     
+
     def __str__(self):
         return f'<{self.id}> : {self.title}'
 

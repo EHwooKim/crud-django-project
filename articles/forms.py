@@ -25,7 +25,7 @@ class ArticleForm(forms.ModelForm):
     # 데이터에 대한 데이터
     class Meta:
         model = Article
-        exclude = ('user',)
+        fields = ('title', 'content', 'image',)
         # 위젯 설정 1.
         # widgets = {
         #     'title':forms.TextInput(

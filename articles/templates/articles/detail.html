@@ -16,8 +16,15 @@
       <img src="{{article.image_thumbnail.url}}" alt="{{article.image.name}}">
     {% endif %}      
       <p>{{ article.content }}</p>
-    </div>
-    <hr>
+    </div><hr>
+    <a href="{% url 'articles:like' article.pk%}">
+      {% if user not in article.like_users.all %}
+      <i class="far fa-heart fa-2x red_hover" style="color: gray"></i>
+      {% else %}
+      <i class="fas fa-heart fa-5x animated bounce" style="color: red"></i>
+      {% endif %}
+    </a> 
+    <p>{{article.like_users.count}}명이 좋아합니다</p>
     <div>
       <div style="float:left;">
         <p>댓글</p>

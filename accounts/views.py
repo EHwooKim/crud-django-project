@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import login as auth_login # login이라는 함수 우리가 정의해서 쓰고있어서 헷갈리지않게 이름 변경
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash # 이게 비번 바꾸고 로그인해주는거
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from IPython import embed
 
 from .forms import CustomUserChangeForm, CustomUserCreationForm
@@ -96,3 +97,16 @@ def password_change(request):
         'form':form
     }
     return render(request, 'accounts/form.html', context)
+
+
+def profile(request, account_pk):
+    # user = User.objects.get(pk=account_pk) 이거 아니다아
+    User = get_user_model()  # user model은 이렇게 불러온다고 생각하랬지
+    user = get_object_or_404(User, pk=account_pk) # 여기에서 특정 유저를 불러오는 거고
+    if user == request.user:
+        context = {
+            'user_profile': user
+        }
+        return render(request, 'accounts/profile.html', context)
+    else:
+        return redirect('articles:index')

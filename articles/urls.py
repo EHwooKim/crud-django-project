@@ -14,4 +14,5 @@ urlpatterns = [
     path('<int:article_pk>/comment_create/', views.comment_create, name='comment_create'),
     # path('<int:comment_pk>/comment_delete/', views.comment_delete, name='comment_delete'), 이렇게 해도 되지만 그냥 의미를 담을겸 밑에처럼 해보자
     path('<int:article_pk>/comments/<int:comment_pk>/delete/', views.comment_delete, name='comment_delete'),
+    path('<int:article_pk>/like/', views.like, name = 'like') # user_id, article_id 모두 필요하지만 user_id는 request에 있을 테니 article_pk 만 넘겼다
 ]
