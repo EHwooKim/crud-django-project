@@ -1,30 +1,55 @@
 {% extends 'articles/base.html' %}
 {% block body %}
 <h1>{{user_profile.username}} 프로필</h1> <hr>
-<h3>작성한 게시글 {{user_profile.article_set.all.count}}</h3>
-<ul>
-    {% for article in user_profile.article_set.all %} 
-        <a href="{% url 'articles:detail' article.pk%}" style="color:black">
-            <li>{{article.title}}</li>
-        </a>
-    {% endfor %}
-</ul>
 
-<h3>작성한 댓글 {{user_profile.comment_set.all.count}}</h3>
-<ul>    
-    {% for comment in user_profile.comment_set.all %} 
-        <a href="{% url 'articles:detail' comment.article_id%}" style="color:black">
-            <li>{{comment.article_id}}글에 작성한 댓글 | {{comment.content}}</li>
-        </a>
-    {% endfor %}
-</ul>
+{% with user_profile.followers.all as followers %}
+    <a href="{% url 'accounts:follow' user_profile.pk %}">
+        {% if user in followers %}
+        팔로우취소
+        {% else %}
+        팔로우
+        {% endif %}
+    </a>
+    <h2>팔로우: {{user_profile.followings.all.count}}</h2>
+    <h2>팔로워: {{followers|length}}</h2>
+{% endwith %}
+<!-- 쿼리를 너무 날리니까 위와 같이 단순화 가능-->
+{% comment %} <a href="{% url 'accounts:follow' user_profile.pk %}">
+    {% if user in user_profile.followers.all %}
+    팔로우취소
+    {% else %}
+    팔로우
+    {% endif %}
+</a>
+<h2>팔로우: {{user_profile.followings.all.count}}</h2>
+<h2>팔로워: {{user_profile.followers.all.count}}</h2> {% endcomment %}
 
-<h3>좋아요한 글 {{user_profile.like_articles.count}}</h3>
-<ul>    
-    {% for like_article in user_profile.like_articles.all %} 
-        <a href="{% url 'articles:detail' like_article.pk%}" style="color:black">
-            <li>{{like_article.title}}</li>
-        </a>    
-    {% endfor %}
-</ul>
+{% if user == user_profile %}
+    <h3>작성한 게시글 {{user_profile.article_set.all.count}}</h3>
+    <ul>
+        {% for article in user_profile.article_set.all %} 
+            <a href="{% url 'articles:detail' article.pk%}" style="color:black">
+                <li>{{article.title}}</li>
+            </a>
+        {% endfor %}
+    </ul>
+
+    <h3>작성한 댓글 {{user_profile.comment_set.all.count}}</h3>
+    <ul>    
+        {% for comment in user_profile.comment_set.all %} 
+            <a href="{% url 'articles:detail' comment.article_id%}" style="color:black">
+                <li>{{comment.article_id}}글에 작성한 댓글 | {{comment.content}}</li>
+            </a>
+        {% endfor %}
+    </ul>
+
+    <h3>좋아요한 글 {{user_profile.like_articles.count}}</h3>
+    <ul>    
+        {% for like_article in user_profile.like_articles.all %} 
+            <a href="{% url 'articles:detail' like_article.pk%}" style="color:black">
+                <li>{{like_article.title}}</li>
+            </a>    
+        {% endfor %}
+    </ul>
+{% endif %}
 {% endblock %}

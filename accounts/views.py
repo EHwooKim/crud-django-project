@@ -103,10 +103,25 @@ def profile(request, account_pk):
     # user = User.objects.get(pk=account_pk) 이거 아니다아
     User = get_user_model()  # user model은 이렇게 불러온다고 생각하랬지
     user = get_object_or_404(User, pk=account_pk) # 여기에서 특정 유저를 불러오는 거고
-    if user == request.user:
-        context = {
-            'user_profile': user
-        }
-        return render(request, 'accounts/profile.html', context)
-    else:
-        return redirect('articles:index')
+    context = {
+        'user_profile': user
+    }
+    return render(request, 'accounts/profile.html', context)
+
+
+def follow(request, account_pk):
+    User = get_user_model()
+    user = get_object_or_404(User, pk=account_pk) # 이 user가 obama
+    if user != request.user:
+        # user(obama)를 팔로우한적 있다면
+        if request.user in user.followers.all():
+        # if user in request.user.followings.all(): 위랑 이거랑 같은거겠지
+            # 취소
+            user.followers.remove(request.user)
+        # 아니면
+        else:
+            # 팔로우
+            user.followers.add(request.user)
+    return redirect('accounts:profile', user.pk)
+
+
