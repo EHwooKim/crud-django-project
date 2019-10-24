@@ -1,6 +1,9 @@
 {% extends 'articles/base.html' %}
+{% load gravatar %}
+
 {% block body %}
-<h1>{{user_profile.username}} 프로필</h1> <hr>
+
+<h1><img src="{{ user.email|makehash}}" alt="">{{user_profile.username}} 프로필</h1> <hr>
 
 {% with user_profile.followers.all as followers %}
     <a href="{% url 'accounts:follow' user_profile.pk %}">

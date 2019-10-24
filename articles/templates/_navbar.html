@@ -33,7 +33,9 @@
             <!-- 로그인이 되어 있다면 -->
             {% if user.is_authenticated %}
             <li class="nav-item">
-                <img src="{{ user.email|makehash}}" alt="">
+                <a class="nav-link" href="{% url 'accounts:profile' user.pk%}">
+                    <img src="{{ user.email|makehash}}" alt="">
+                </a>
             </li>
             <li class="nav-item">
                 <!-- request안에 정보가 담겨있어서 이렇게만 써도 user 이름이 나온다. context로 담지 않아도 된다! -->

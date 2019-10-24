@@ -18,9 +18,6 @@ class HashTag(models.Model):
         return self.content
 
     
-
-
-
 class Article(models.Model):    # models.Model 을 상속 받는 형식으로 쓴다. ~.~.get()으로 앞으로 데이터 사용하는게 여기 들어있거든
     # id : integer 자동으로 정의(Primary Key)
     # id = models.AutoField(primary_key=True) -> Integer 값이 자동으로 하나씩 증가 (AUTOINCREMENT)
@@ -60,6 +57,7 @@ class Article(models.Model):    # models.Model 을 상속 받는 형식으로 �
 
     def __str__(self):
         return f'<{self.id}> : {self.title}'
+
 
 class Comment(models.Model):
     content = models.CharField(max_length=140)

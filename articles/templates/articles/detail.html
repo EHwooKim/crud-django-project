@@ -17,7 +17,7 @@
       <img src="{{article.image_thumbnail.url}}" alt="{{article.image.name}}">
     {% endif %}      
       {% comment %} <p>{{ article.content|linebreaksbr }}</p> {% endcomment %}
-      <p>{{ article|make_link|safe }}</p>
+      <p>{{ article|make_link|safe|linebreaksbr }}</p>
     </div><hr>
     <a href="{% url 'articles:like' article.pk%}">
       {% if user not in article.like_users.all %}
