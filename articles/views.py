@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseForbidden # 시험에서 이�
 
 
 
-from .models import Article, Comment
+from .models import Article, Comment, HashTag
 # Create your views here.
 
 def index(request):
@@ -40,8 +40,7 @@ def detail(request, article_pk):
     }
     return render(request, 'articles/detail.html', context)
 
-# def new(request):
-#     return render(request, 'articles/new.html')
+
 @login_required
 def create(request):
     if request.method == 'POST':
@@ -59,6 +58,22 @@ def create(request):
             # user instance를 가져와야한다. 그건 어디에 있다? requset.user
             article.user = request.user
             article.save()
+            ## !--- HashTag 저장 및 연결 작업---! [article의 pk가 있어야 M:N관계를 연결해줄수 있을테니 여기서 해야겠지]
+            
+            for word in article.content.split():
+                if word.startswith('#'):
+                    # if HashTag.objects.filter(content=word).exists(): # exists()없이도 되는데 있으면 다 가져와서 뭘 하는게 아닌 존재여부만 알려주니 좋지
+                    #     HashTag.objects.get(content=word) # get은 위험하지만 있다는게 확실하니 써도 되겠지
+                    # else:
+                    #     hashtag = HashTag.objects.create(content=word)
+                    # try:
+                    #     hastag = HashTag.objects.get(content=word)
+                    # except:
+                    #     hashtag = HashTag.objects.create(content=word)
+                    # 위의 두 방법도 돌아는 가겠지만 더 좋은 장고 기능이 있다
+                    hashtag, created = HashTag.objects.get_or_create(content=word)  # (object, created) 튜플을 return한다
+                    article.hashtags.add(hashtag)
+
             return redirect('articles:detail', article.pk)
     else:
     # GET 요청 처리 -> form 만 주는거
@@ -85,6 +100,11 @@ def update(request, article_pk):
                 # article.content = article_form.cleaned_data.get('content')
                 # article.save()
                 article = article_form.save()
+                article.hashtags.clear()  # 해시태그 다 삭제하고 다시 태그 등록 과정 한다.
+                for word in article.content.split():
+                    if word.startswith('#'):
+                        hashtag, created = HashTag.objects.get_or_create(content=word)
+                        article.hashtags.add(hashtag)                
                 return redirect('articles:detail', article_pk)
         else:
             # article_form = ArticleForm(
@@ -178,3 +198,10 @@ def like(request, article_pk):
         article.like_users.add(request.user)
     return  redirect('articles:detail', article_pk)
     
+
+def hashtag(request, hashtag_pk):
+    hashtag = get_object_or_404(HashTag, id=hashtag_pk)
+    context = {
+        'hashtag': hashtag
+    }
+    return render(request, 'articles/hashtags.html', context)

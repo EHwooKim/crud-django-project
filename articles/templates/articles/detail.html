@@ -1,4 +1,5 @@
 {% extends 'articles/base.html' %}
+{% load hashtag %}
 
 {% block body %}
   <div class="mt-5">
@@ -15,7 +16,8 @@
       <img src="{{article.image.url}}" alt="{{article.image.name}}">
       <img src="{{article.image_thumbnail.url}}" alt="{{article.image.name}}">
     {% endif %}      
-      <p>{{ article.content }}</p>
+      {% comment %} <p>{{ article.content|linebreaksbr }}</p> {% endcomment %}
+      <p>{{ article|make_link|safe }}</p>
     </div><hr>
     <a href="{% url 'articles:like' article.pk%}">
       {% if user not in article.like_users.all %}

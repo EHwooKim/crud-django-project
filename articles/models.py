@@ -10,6 +10,17 @@ from django.conf import settings
 # 1. 모델(스키마) 정의
 # 데이터베이스 테이블을 정의하고, 
 # 각각의 컬럼(혹은 필드)를 정의
+
+class HashTag(models.Model):
+    # 게시글과 다르게 hashtag는 중복을 없애야겠지. 동일한 문자는 같은 pk로 관리가 되게.
+    content = models.TextField(unique=True)
+    def __str__(self):
+        return self.content
+
+    
+
+
+
 class Article(models.Model):    # models.Model 을 상속 받는 형식으로 쓴다. ~.~.get()으로 앞으로 데이터 사용하는게 여기 들어있거든
     # id : integer 자동으로 정의(Primary Key)
     # id = models.AutoField(primary_key=True) -> Integer 값이 자동으로 하나씩 증가 (AUTOINCREMENT)
@@ -40,7 +51,12 @@ class Article(models.Model):    # models.Model 을 상속 받는 형식으로 �
                                 related_name = 'like_articles',# through 옵션은 여기서는 필요 없고. user입장에서 user.articles_set.all()을 했을때
                                 blank=True                     # 작성글, 좋아요글 구분을 위해 related_name은 필요하다
                                 )                              # blank_True: 좋아요 처음부터 있는거 아니니까
-                                     
+    hashtags = models.ManyToManyField(
+                                HashTag,
+                                related_name='articles',        # 이 줄 안쓰면 hashtag.article_set 이렇게 접근하면 되겠지
+                                blank=True
+                                )
+
 
     def __str__(self):
         return f'<{self.id}> : {self.title}'
