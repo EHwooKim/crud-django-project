@@ -24,6 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('articles/', include('articles.urls')),
     path('accounts/', include('accounts.urls')),
+    # allauth url은 반드시!!! 기존의 것 밑에 추가하기. 위에쓰면 우리가 만든게 다 묻힌다.
+    path('accounts/', include('allauth.urls')),
     path('hashtags/<int:hashtag_pk>/', views.hashtag, name='hashtag'),
 ]
 

@@ -1,4 +1,5 @@
 {% extends 'articles/base.html' %}
+{% load socialaccount %}
 {% load bootstrap4 %}
 {% block body %}
 
@@ -6,5 +7,10 @@
   {% csrf_token %}
   {% bootstrap_form form %}
   {% bootstrap_button "로그인" button_type="submit" button_class="btn-dark" %}
+  <a href="{% provider_login_url 'kakao' %}">
+    카카오 로그인
+  </a>
+
+
 
 {% endblock %}

@@ -39,6 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages', # messages framework
+    # all-auth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',    
+    'allauth.socialaccount.providers.kakao',    
+    # all-auth end
     'django.contrib.staticfiles',  # static file(css,js)
     'django_extensions',
     'bootstrap4',
@@ -143,3 +150,15 @@ MEDIA_URL = '/media/'
 # AUTH
 LOGIN_URL = '/accounts/login/' #default! @login_required에서 사용된다.
 AUTH_USER_MODEL = 'accounts.User' #default - 'auth.User'
+
+
+# 카카오 로그인 기본설정
+# django-allauth
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# django.contrib.sites 를 추가하면 => SITE_ID를 부여해줘야한다.
+SITE_ID = 1 
+
+LOGIN_REDIRECT_URL = '/articles/'
