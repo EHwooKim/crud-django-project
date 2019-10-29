@@ -34,6 +34,7 @@ class Article(models.Model):    # models.Model 을 상속 받는 형식으로 �
         format='JPEG',
         options={'quality':80},
     )
+
     # DateTimeField
     #   auto_now_add : 생성시 자동으로 저장
     #   auto_now : 수정시마다 자동으로 저장
