@@ -19,14 +19,12 @@
       {% comment %} <p>{{ article.content|linebreaksbr }}</p> {% endcomment %}
       <p>{{ article|make_link|safe|linebreaksbr }}</p>
     </div><hr>
-    <a href="{% url 'articles:like' article.pk%}">
       {% if user not in article.like_users.all %}
-      <i class="far fa-heart fa-2x red_hover" style="color: gray"></i>
+      <i id="like-button" data-id="{{article.id}}" class="fa-heart fa-2x far red_hover" style="color: gray"></i>
       {% else %}
-      <i class="fas fa-heart fa-5x animated bounce" style="color: red"></i>
+      <i id="like-button" data-id="{{article.id}}" class="fa-heart fa-2x fas animated bounce" style="color: red"></i>
       {% endif %}
-    </a> 
-    <p>{{article.like_users.count}}명이 좋아합니다</p>
+    <p><span id="like_count">{{article.like_users.count}}</span>명이 좋아합니다</p>
     <div>
       <div style="float:left;">
         <p>댓글</p>
@@ -66,4 +64,25 @@
       <input class="d-block btn btn-dark ml-auto mt-2 " type="submit" value="등록">
     </form>
   </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    const likeButton = document.querySelector("#like-button")
+    likeButton.addEventListener('click', function(event) {
+      axios.get(`/articles/${event.target.dataset.id}/like/`)
+        .then(response =>{
+          if (response.data.is_liked) {
+            event.target.classList.remove('far','red_hover')
+            event.target.classList.add('fas','animated','bounce')
+            event.target.style.color='red'
+          } else {
+            event.target.classList.add('far','red_hover')
+            event.target.classList.remove('fas','animated','bounce')
+            event.target.style.color='gray'
+          }
+          document.querySelector('#like_count').innerText = `${response.data.like_count}`
+        })
+    })
+  </script>
 {% endblock %}

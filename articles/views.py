@@ -8,6 +8,9 @@ import bootstrap4
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseForbidden # 시험에서 이건 안나온다
 
+# js로 좋아요 처리
+from django.http import JsonResponse
+
 
 
 from .models import Article, Comment, HashTag
@@ -189,14 +192,18 @@ def comment_delete(request, article_pk, comment_pk):
 def like(request, article_pk):
     article = Article.objects.get(id=article_pk)
     # 좋아요를 누른적이 있다면?
+    is_liked = True
     if request.user in article.like_users.all():
         #좋아요 취소 로직
         article.like_users.remove(request.user)
+        is_lked = False
     # 아니면
     else:
         #좋아요 로직
         article.like_users.add(request.user)
-    return  redirect('articles:detail', article_pk)
+        is_lked = True
+    like_count = article.like_users.count()
+    return  JsonResponse({'is_liked':is_lked, 'like_count':like_count})
     
 
 def hashtag(request, hashtag_pk):
