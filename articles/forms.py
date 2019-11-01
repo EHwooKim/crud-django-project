@@ -37,6 +37,12 @@ class ArticleForm(forms.ModelForm):
         # 아래처럼 원하는 것만 뽑을 수도 있다.
         # fields = ('title',)
         # exclude - ('title', ) 처럼 써서  필요없는거 뺼 수도 있다
+
+    def save(self, user_id):
+        self.instance.user_id = user_id
+        super().save()
+        return self.instance
+
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

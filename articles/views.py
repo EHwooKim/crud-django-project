@@ -57,10 +57,10 @@ def create(request):
             # article = Article(title=title, content=content)
             # article.save()
             # meta 어쩌구 이후로는 바로 이렇게만 해도 된다
-            article = article_form.save(commit=False)
+            # article = article_form.save(commit=False)
             # user instance를 가져와야한다. 그건 어디에 있다? requset.user
-            article.user = request.user
-            article.save()
+            # article.user = request.user
+            article = article_form.save(user_id=request.user.id)
             ## !--- HashTag 저장 및 연결 작업---! [article의 pk가 있어야 M:N관계를 연결해줄수 있을테니 여기서 해야겠지]
             
             for word in article.content.split():
