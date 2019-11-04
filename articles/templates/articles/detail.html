@@ -70,7 +70,13 @@
 <script>
     const likeButton = document.querySelector("#like-button")
     likeButton.addEventListener('click', function(event) {
-      axios.get(`/articles/${event.target.dataset.id}/like/`)
+      console.log(event.target.dataset)
+      // POST 요청 보낼 때 csrtoken을 AJAX 요청시 설정하는 법
+      axios.defaults.xsrfCookieName = 'csrftoken'
+      axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+      // django에서 is_ajax() 분기가 되는 기준이 아래의 헤더 설정에 따라서 진행
+      axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+      axios.post(`/articles/${event.target.dataset.id}/like/`)
         .then(response =>{
           if (response.data.is_liked) {
             event.target.classList.remove('far','red_hover')
@@ -83,6 +89,9 @@
           }
           document.querySelector('#like_count').innerText = `${response.data.like_count}`
         })
+      .catch(error => {
+        console.log(error)
+      })
     })
   </script>
 {% endblock %}

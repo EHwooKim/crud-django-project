@@ -190,20 +190,23 @@ def comment_delete(request, article_pk, comment_pk):
 
 @login_required # 함수내에서 request.user를 쓰게 되면 로그인 확인 처리 하는거 잊지말아라!!!!!!!!!!!
 def like(request, article_pk):
-    article = Article.objects.get(id=article_pk)
-    # 좋아요를 누른적이 있다면?
-    is_liked = True
-    if request.user in article.like_users.all():
-        #좋아요 취소 로직
-        article.like_users.remove(request.user)
-        is_lked = False
-    # 아니면
+    if request.is_ajax():
+        article = Article.objects.get(id=article_pk)
+        # 좋아요를 누른적이 있다면?
+        is_liked = True
+        if request.user in article.like_users.all():
+            #좋아요 취소 로직
+            article.like_users.remove(request.user)
+            is_lked = False
+        # 아니면
+        else:
+            #좋아요 로직
+            article.like_users.add(request.user)
+            is_lked = True
+        like_count = article.like_users.count()
+        return  JsonResponse({'is_liked':is_lked, 'like_count':like_count})
     else:
-        #좋아요 로직
-        article.like_users.add(request.user)
-        is_lked = True
-    like_count = article.like_users.count()
-    return  JsonResponse({'is_liked':is_lked, 'like_count':like_count})
+        return HttpResponseForbidden
     
 
 def hashtag(request, hashtag_pk):
